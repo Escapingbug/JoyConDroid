@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -125,6 +126,21 @@ public class ControllerActivity extends AppCompatActivity {
         transaction.commit();
 
         askingDiscoverable = false;
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        if (hasFocus) {
+            log(TAG, "requesting pointer capture..");
+            View view = controllerFragment.getView();
+            controllerFragment.getView().requestPointerCapture();
+            view.setOnCapturedPointerListener(((view1, motionEvent) -> {
+            log(TAG, "got mouse capture event");
+            return true;
+        }));
+        }
     }
 
     private void initializeBluetooth() {

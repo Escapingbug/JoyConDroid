@@ -5,15 +5,20 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -21,10 +26,12 @@ import com.erz.joysticklibrary.JoyStick;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
+import com.rdapps.gamepad.ControllerActivity;
 import com.rdapps.gamepad.R;
 import com.rdapps.gamepad.device.ButtonType;
 import com.rdapps.gamepad.device.JoystickType;
 import com.rdapps.gamepad.led.LedState;
+import com.rdapps.gamepad.log.JoyConLog;
 import com.rdapps.gamepad.model.ControllerAction;
 import com.rdapps.gamepad.protocol.JoyController;
 import com.rdapps.gamepad.util.Pair;
@@ -54,6 +61,8 @@ import static com.rdapps.gamepad.util.EventUtils.getTouchUpEvent;
 
 public abstract class ControllerFragment extends Fragment {
 
+    private static String TAG = ControllerFragment.class.getName();
+
     private Context context;
     private SensorManager sensorManager;
     private Sensor senAccelerometer;
@@ -75,12 +84,13 @@ public abstract class ControllerFragment extends Fragment {
     private float prevLeftX = 0;
     private float prevLeftY = 0;
 
+    private VelocityTracker velocityTracker;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
     }
-
 
     @Override
     public Context getContext() {
@@ -272,9 +282,44 @@ public abstract class ControllerFragment extends Fragment {
                 .orElse(false);
     }
 
+    private boolean handleMouseEvent(MotionEvent motionEvent) {
+        int index = motionEvent.getActionIndex();
+        int pointerId = motionEvent.getPointerId(index);
+
+        switch (motionEvent.getAction()) {
+            case MotionEvent.ACTION_HOVER_ENTER:
+                if (velocityTracker == null) {
+                    velocityTracker = VelocityTracker.obtain();
+                } else {
+                    velocityTracker.clear();
+                }
+
+                velocityTracker.addMovement(motionEvent);
+                break;
+            case MotionEvent.ACTION_HOVER_EXIT:
+                velocityTracker.clear();
+                break;
+            case MotionEvent.ACTION_HOVER_MOVE:
+                velocityTracker.addMovement(motionEvent);
+                velocityTracker.computeCurrentVelocity(1000);
+
+                float xVelocity = velocityTracker.getXVelocity(pointerId);
+                float yVelocity = velocityTracker.getYVelocity(pointerId);
+
+                device.onMouseMove(xVelocity, yVelocity);
+                break;
+        }
+
+        return false;
+    }
+
     public boolean handleGenericMotionEvent(MotionEvent motionEvent) {
         if (motionEvent == null) {
             return false;
+        }
+
+        if (handleMouseEvent(motionEvent)) {
+            return true;
         }
 
         InputDevice device = motionEvent.getDevice();

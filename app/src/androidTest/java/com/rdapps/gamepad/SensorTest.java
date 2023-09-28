@@ -28,6 +28,10 @@ public class SensorTest {
 
     private static JoyController joyController;
 
+    private void log(String tag, String content) {
+        Log.i(tag, content);
+    }
+
     @BeforeClass
     public static void setup() {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();

@@ -40,12 +40,14 @@ import static com.rdapps.gamepad.button.ButtonEnum.ZL;
 import static com.rdapps.gamepad.button.ButtonEnum.ZR;
 import static com.rdapps.gamepad.button.ButtonState.BUTTON_DOWN;
 import static com.rdapps.gamepad.button.ButtonState.BUTTON_UP;
+import static com.rdapps.gamepad.log.JoyConLog.log;
 import static com.rdapps.gamepad.vibrator.VibrationPattern.BUTTON_PRESS;
 import static com.rdapps.gamepad.vibrator.VibrationPattern.BUTTON_RELEASE;
 import static com.rdapps.gamepad.vibrator.VibrationPattern.STICK_PRESS;
 import static com.rdapps.gamepad.vibrator.VibrationPattern.STICK_RELEASE;
 
 public class ProControllerFragment extends ControllerFragment implements View.OnClickListener {
+    private static final String TAG = ProControllerFragment.class.getName();
 
     private Button up;
     private Button down;

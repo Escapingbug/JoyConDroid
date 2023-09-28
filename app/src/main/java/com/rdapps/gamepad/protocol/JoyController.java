@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHidDevice;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
 
 import com.google.android.gms.common.util.Hex;
 import com.rdapps.gamepad.BuildConfig;
@@ -276,6 +277,16 @@ public class JoyController extends AbstractDevice {
                 gyroscopeEvents.add(GyroscopeEvent.createFromSensorEvent(event));
             }
         }
+    }
+
+    public void onMouseMove(float xVelocity, float yVelocity) {
+        xVelocity = xVelocity / 10000;
+        yVelocity = yVelocity / 10000;
+        GyroscopeEvent fakeEvent = new GyroscopeEvent();
+        fakeEvent.values = new float[] { xVelocity, yVelocity, 0 };
+        fakeEvent.accuracy = SensorManager.SENSOR_STATUS_ACCURACY_HIGH;
+        log(TAG, "got mouse move: " + xVelocity + ", " + yVelocity);
+        gyroscopeEvents.add(fakeEvent);
     }
 
     @Override

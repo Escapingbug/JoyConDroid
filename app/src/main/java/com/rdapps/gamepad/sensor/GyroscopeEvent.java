@@ -2,6 +2,7 @@ package com.rdapps.gamepad.sensor;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.util.Log;
 
 import lombok.Data;
 
@@ -11,6 +12,8 @@ public class GyroscopeEvent {
     public Sensor sensor;
     public long timestamp;
     public float[] values;
+
+    private static String TAG = GyroscopeEvent.class.getName();
 
     public static GyroscopeEvent createFromSensorEvent(SensorEvent event) {
         GyroscopeEvent e = new GyroscopeEvent();

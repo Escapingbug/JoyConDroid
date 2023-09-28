@@ -25,7 +25,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
+import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -36,6 +38,7 @@ import com.rdapps.gamepad.R;
  * JoyStick view with lots of customizable options
  */
 public class JoyStick extends View implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+    private static final String TAG = JoyStick.class.getName();
 
     public static final int DIRECTION_CENTER = -1;
     public static final int DIRECTION_LEFT = 0;
@@ -173,6 +176,10 @@ public class JoyStick extends View implements GestureDetector.OnGestureListener,
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!event.isFromSource(InputDevice.SOURCE_TOUCHSCREEN)) {
+            return false;
+        }
+
         gestureDetector.onTouchEvent(event);
 
         switch (event.getAction()) {
